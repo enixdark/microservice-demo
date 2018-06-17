@@ -22,6 +22,7 @@ class TestUser(unittest.TestCase):
         self.user = User.create(
             first_name="cong",
             last_name="quan",
+            password='12345678',
             email='quandc@example.com',
             role=UserRole.MEMBER,
         )
@@ -36,6 +37,7 @@ class TestUser(unittest.TestCase):
             first_name="cong",
             last_name="quan",
             role=UserRole.MEMBER,
+            password='12345678',
             email='hello@example.com'
         )
         self.assertEqual(User.query.count(), 2)

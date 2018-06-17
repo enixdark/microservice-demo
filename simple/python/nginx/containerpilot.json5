@@ -1,0 +1,97 @@
+{
+  consul: "consul:8500",
+  logging: {
+    "level": "INFO",
+    "format": "text"
+  },
+  jobs: [
+    {
+      name: "preStart",
+      exec: [
+        "/bin/reload-nginx.sh", "preStart"
+      ],
+    },
+    {
+      name: "onChange-kong-8000",
+      exec: [
+        "/bin/reload-nginx.sh", "onChange"
+      ],
+      when: {
+        source: "watch.kong-8000",
+        each: "changed"
+      }
+    },
+    {
+      name: "onChange-kong-8001",
+      exec: [
+        "/bin/reload-nginx.sh", "onChange"
+      ],
+      when: {
+        source: "watch.kong-8001",
+        each: "changed"
+      }
+    },
+    {
+      name: "onChange-kong-8443",
+      exec: [
+        "/bin/reload-nginx.sh", "onChange"
+      ],
+      when: {
+        source: "watch.kong-8443",
+        each: "changed"
+      }
+    },
+    {
+      name: "onChange-kong-8444",
+      exec: [
+        "/bin/reload-nginx.sh", "onChange"
+      ],
+      when: {
+        source: "watch.kong-8444",
+        each: "changed"
+      }
+    },
+    {
+      name: "nginx",
+      exec: ["nginx", "-g", "daemon off;"],
+      port: 80,
+      restarts: "unlimited",
+      interfaces: [
+        "eth1", 
+        "eth0"
+      ],
+      tags: [
+        "nginx",
+      ],
+      when: {
+        source: "preStart",
+        once: "exitSuccess",
+        timeout: "120s"
+      },
+      health: {
+        exec: "/usr/bin/curl --fail -o /dev/null -s http://localhost:80/health",
+        interval: 5,
+        ttl: 25,
+        timeout: "10s"
+      }
+    }
+  ],
+  watches: [
+    {
+      name: "kong-8000",
+      interval: 10
+    },
+    {
+      name: "kong-8443",
+      interval: 10
+    },
+    {
+      name: "kong-8001",
+      interval: 10
+    },
+    {
+      name: "kong-8444",
+      interval: 10
+    },
+  ]
+}

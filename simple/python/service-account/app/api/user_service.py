@@ -62,7 +62,7 @@ class UserService(UserBase):
         return ' %s not found' % user.email, 404
 
 
-class UserServiceList(UserBase):
+class UserService(UserBase):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
