@@ -31,7 +31,7 @@ db = SQLAlchemy(application)
 migrate = Migrate(application, db)
 
 
-from app.api.auth_service import AuthService
+from app.api.auth_service import AuthService, AuthServiceList
 
 
 # register for debugging
@@ -43,6 +43,7 @@ manager.add_command('db', MigrateCommand)
 
 # wrap to api
 api = Api(application)
-api.add_resource(AuthService, '/auth')
+api.add_resource(AuthService, '/auths')
+api.add_resource(AuthServiceList, '/auth/<id>')
 
 # app.register_blueprint(api)

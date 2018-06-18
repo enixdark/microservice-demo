@@ -16,7 +16,7 @@ user_fields = {
     "auth_id": fields.String,
     "password": fields.String,
     "email": fields.String,
-    "delete": fields.Boolean
+    "is_delete": fields.Boolean
 }
 
 

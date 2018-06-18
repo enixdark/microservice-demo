@@ -45,9 +45,9 @@ class Auth(CRUDMixin, db.Model):
 
     @classmethod
     def __declare_last__(cls):
-        ValidateString(User.password)
-        ValidateEmail(User.email)
-        ValidateBoolean(User.delete)
+        ValidateString(Auth.password)
+        ValidateEmail(Auth.email)
+        ValidateBoolean(Auth.is_delete)
 
     def __repr__(self):
         return '<Auth %s>' % self.email
