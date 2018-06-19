@@ -2,9 +2,7 @@ import os
 import unittest
 # from faker import Faker
 from app import application, db
-from app.models.user import (
-    User, UserRole
-)
+from app.models.auth import Auth
 import json
 
 
@@ -17,12 +15,10 @@ class TestApi(unittest.TestCase):
         self.client = application.test_client()
         self.db = db
         self.db.create_all()
-        self.user = User.create(
-            first_name="cong",
-            last_name="quan",
+        self.auth = Auth.create(
+            email="cqshinn92@gmail.com",
             password='12345678',
-            email='quandc@example.com',
-            role=UserRole.MEMBER,
+            token='SUmnfqii5wcuJz8WZrWJw66AsE9',
         )
 
     def tearDown(self):
@@ -31,44 +27,43 @@ class TestApi(unittest.TestCase):
 
     def test_get_user(self):
         response = self.client.get(
-            '/user/%d' % self.user.id,
+            '/auth/%d' % self.auth.id,
         )
         data = json.loads(response.data)
-        self.assertEqual(data['first_name'], "cong")
-        self.assertEqual(data['last_name'], "quan")
-        self.assertEqual(data['email'], "quandc@example.com")
-        self.assertEqual(data['delete'], False)
+        self.assertEqual(data['email'], "cqshinn92@gmail.com")
+        self.assertEqual(data['token'], "SUmnfqii5wcuJz8WZrWJw66AsE9")
+        self.assertEqual(data['is_delete'], False)
 
-    def test_create_user(self):
-        self.assertEqual(User.query.count(), 1)
+    def test_sign_in_user(self):
+        import pdb;pdb.set_trace()
+        self.assertEqual(Auth.query.count(), 1)
         response = self.client.post(
-            '/users', data=json.dumps({
-                       "first_name": "hello", 
-                       "last_name": "world",
-                       "email": "test@example.com",
+            '/auth', data=json.dumps({
+                       "email": "cqshinn92@example.com",
                        "password": "12345678"
                     }), content_type='application/json'
         )
-        self.assertEqual('202 ACCEPTED', response.status)
-        self.assertEqual(User.query.count(), 2)
+        # self.assertEqual('202 ACCEPTED', response.status)
+        # self.assertEqual(User.query.count(), 2)
 
-    def test_update_user(self):
-        user = User.query.first()
+    def test_update_auth_user(self):
+        auth = Auth.query.first()
         response = self.client.put(
-            '/user/%d' % user.id, data=json.dumps({
-                "last_name": "quan",
+            '/auth/%d' % auth.id, data=json.dumps({
+                "email": "quancong@gmail.com",
                 "password": "12345678"
             }), content_type='application/json'
         )
         self.assertEqual('202 ACCEPTED', response.status)
-        user = User.query.first()
-        self.assertEqual("cong quan", user.full_name)
+        auth = Auth.query.first()
+        self.assertEqual("quancong@gmail.com", auth.email)
 
-    def test_delete_user(self):
-        id = User.query.first().id
+    def test_delete_auth(self):
+        id = Auth.query.first().id
         response = self.client.delete(
-            '/user/%d' % self.user.id
+            '/auth/%d' % self.auth.id
         )
-        self.assertEqual(User.query.filter_by(id=id).first().delete, True)
+        self.assertEqual(Auth.query.filter_by(id=id).first().is_delete, True)
+
 if __name__ == '__main__':
     unittest.main()

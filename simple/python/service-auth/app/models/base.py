@@ -31,5 +31,5 @@ class CRUDMixin(object):
         return self
 
     def remove(self, commit=True):
-        self.delete = True
+        self.is_delete = True
         return commit and self.save()

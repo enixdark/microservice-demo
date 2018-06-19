@@ -14,9 +14,7 @@ user_fields = {
     "last_name": fields.String,
     "role": fields.String,
     "auth_id": fields.String,
-    "password": fields.String,
     "email": fields.String,
-    "is_delete": fields.Boolean
 }
 
 
@@ -30,21 +28,14 @@ class UserBase(Resource):
                                    help='No last name', location='json')
         self.reqparse.add_argument('role', type=str, required=False,
                                    help='No last name', location='json')
-        self.reqparse.add_argument('auth_id', type=str, required=False,
+        self.reqparse.add_argument('auth_id', type=str, required=True,
                                    help='No auth id', location='json')
-        self.reqparse.add_argument(
-            'password',
-            type=str,
-            default="",
-            required=True,
-            location='json')
         self.reqparse.add_argument(
             'email',
             type=str,
             default="",
             required=True,
             location='json')
-        self.reqparse.add_argument('delete', type=bool, location='json')
         super(UserBase, self).__init__()
 
 
@@ -62,7 +53,7 @@ class UserService(UserBase):
         return ' %s not found' % user.email, 404
 
 
-class UserService(UserBase):
+class UserServiceList(UserBase):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -72,16 +63,10 @@ class UserService(UserBase):
                                    help='No last name', location='json')
         self.reqparse.add_argument('role', type=str, required=False,
                                    help='No last name', location='json')
-        self.reqparse.add_argument('auth_id', type=str, required=False,
+        self.reqparse.add_argument('auth_id', type=str, required=True,
                                    help='No auth id', location='json')
-        self.reqparse.add_argument(
-            'password',
-            type=str,
-            default="",
-            required=True,
-            location='json')
-        self.reqparse.add_argument('delete', type=bool, location='json')
-
+        self.reqparse.add_argument('email', type=str, required=True,
+                                   help='No email', location='json')
     def get(self, id):
         user = User.get(id)
         if user and (not user.delete):
