@@ -1,67 +1,72 @@
-import os
 import unittest
 # from faker import Faker
 from app import application, db
-from app.models.user import User
+from app.models.post import Post
 import json
+import datetime
+from bson.objectid import ObjectId
 
 
 class TestApi(unittest.TestCase):
 
     def setUp(self):
-        # self.db, application.config['DATABASE'] = tempfile.mkstemp()
-        # application.config.from_pyfile('config/development.cfg')
+        # application.config.from_pyfile('config/test.cfg')
         application.config['TESTING'] = True
         self.client = application.test_client()
         self.db = db
-        self.db.create_all()
-        self.user = User.create(
-            username="quandc",
-            password='12345678',
-            email='quandc@example.com'
+        gen_time = datetime.datetime.now()
+        dummy_id = ObjectId.from_datetime(gen_time)
+        self.post = Post.create(
+            id=dummy_id,
+            title='chao buoi sang',
+            content='day la mini project de demo ve microservice',
+            tags=['microservice', 'python', 'docker'],
+            account_id='1'
         )
 
     def tearDown(self):
-        self.db.session.remove()
-        self.db.drop_all()
+        db = self.db.connect(application.config)
+        db.drop_database(application.config['MONGODB_DB'])
 
-    def test_get_user(self):
+    def test_get_post(self):
         response = self.client.get(
-            '/user/%d' % self.user.id,
+            '/post/%s' % str(self.post.id),
         )
         data = json.loads(response.data)
-        self.assertEqual(data['username'], "quandc")
-        self.assertEqual(data['email'], "quandc@example.com")
-        self.assertEqual(data['delete'], False)
+        self.assertEqual(data['title'], 'chao buoi sang')
+        self.assertEqual(data['content'], 'day la mini project de demo ve microservice')
 
-    def test_create_user(self):
-        self.assertEqual(User.query.count(), 1)
+    def test_create_post(self):
+        self.assertEqual(Post.objects.count(), 1)
         response = self.client.post(
-            '/users', data=json.dumps({"username": "hello", "email":
-                       "test@example.com",
-                       "password": "12345678"
-                                       }), content_type='application/json'
-        )
-        self.assertEqual('202 ACCEPTED', response.status)
-        self.assertEqual(User.query.count(), 2)
-
-    def test_update_user(self):
-        user = User.query.first()
-        response = self.client.put(
-            '/user/%d' % user.id, data=json.dumps({
-                "username": "hello",
-                "password": "12345678"
+            '/posts', data=json.dumps({
+                'title': 'chao buoi sang',
+                'content': 'day la mini project de demo ve microservice',
+                'tags': ['microservice', 'python', 'docker'],
+                'account_id': '1'
             }), content_type='application/json'
         )
         self.assertEqual('202 ACCEPTED', response.status)
-        user = User.query.first()
-        self.assertEqual("hello", user.username)
+        self.assertEqual(Post.objects.count(), 2)
 
-    def test_delete_user(self):
-        id = User.query.first().id
-        response = self.client.delete(
-            '/user/%d' % self.user.id
+    def test_update_post(self):
+        post = Post.objects.first()
+        response = self.client.put(
+            '/post/%s' % str(post.id),
+            data=json.dumps({'title': 'mini microservice'}),
+            content_type='application/json'
         )
-        self.assertEqual(User.query.filter_by(id=id).first().delete, True)
+        self.assertEqual('202 ACCEPTED', response.status)
+        post = Post.objects.first()
+        self.assertEqual('mini microservice', post.title)
+
+    def test_delete_post(self):
+        id = Post.objects.first().id
+        self.client.delete(
+            '/post/%s' % str(id)
+        )
+        self.assertEqual(Post.get(id=id), None)
+
+
 if __name__ == '__main__':
     unittest.main()

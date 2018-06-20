@@ -1,6 +1,6 @@
 from app import manager
 import coverage
-import unittest 
+import unittest
 
 COV = coverage.coverage(
     branch=True,
@@ -10,6 +10,7 @@ COV = coverage.coverage(
     ]
 )
 COV.start()
+
 
 @manager.command
 def test():
@@ -35,5 +36,6 @@ def cov():
         COV.erase()
         return 0
     return 1
+
 
 manager.run()

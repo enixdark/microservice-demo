@@ -133,7 +133,7 @@ class AuthServiceList(AuthBase):
     def get(self, id):
         auth = Auth.get(id)
         if auth and (not auth.is_delete):
-            return marshal(Auth.get(id), auth_fields), 201
+            return marshal(auth, auth_fields), 201
         return "Not Found"
 
     def delete(self, id):

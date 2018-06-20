@@ -70,12 +70,12 @@ class UserServiceList(UserBase):
     def get(self, id):
         user = User.get(id)
         if user and (not user.delete):
-            return marshal(User.get(id), user_fields), 201
+            return marshal(user, user_fields), 201
         return "Not Found", 404
 
     def delete(self, id):
         user = User.get(id)
-        if user and (not user.delete):
+        if user:
             user.remove()
             return "Delete success", 204
         return "Not Found", 404
@@ -83,6 +83,6 @@ class UserServiceList(UserBase):
     def put(self, id):
         args = self.reqparse.parse_args()
         user = User.get(id)
-        if user and (not user.delete) and user.update(**args):
+        if user and user.update(**args):
             return 'update %s success' % user.email, 202
         return ' %s not found' % user.email, 404

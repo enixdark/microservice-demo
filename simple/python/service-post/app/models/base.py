@@ -1,39 +1,28 @@
-from app import db
-
-
 class CRUDMixin(object):
-    __table_args__ = {'extend_existing': True}
-
-    id = db.Column(db.Integer, primary_key=True)
+    meta = {
+        'abstract': True,
+    }
 
     @classmethod
     def all(cls):
-        return cls.query.all()
+        return cls.objects
 
     @classmethod
-    def create(cls, commit=True, **kwargs):
+    def create(cls, **kwargs):
         instance = cls(**kwargs)
-        return instance.save(commit=commit)
+        return instance.save()
 
     @classmethod
     def get(cls, id):
-        return cls.query.get(id)
-
-    @classmethod
-    def get_or_404(cls, id):
-        return cls.query.get_or_404(id)
+        try:
+            return cls.objects(id=id).first()
+        except Exception as error:
+            return None
 
     def update(self, **kwargs):
-        for attr, value in kwargs.iteritems():
+        for attr, value in kwargs.items():
             setattr(self, attr, value)
         return self.save() or self
 
-    def save(self, commit=True):
-        db.session.add(self)
-        if commit:
-            db.session.commit()
-        return self
-
-    def remove(self, commit=True):
-        self.delete = True
-        return commit and self.save()
+    def remove(self):
+        return self.delete()
